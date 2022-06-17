@@ -1,0 +1,9 @@
+body {
+    text-align: center;
+    font-family: "Roboto Thin", sans-serif;
+}
+
+#mainCanvas {
+    cursor: url("pixel-art-cursor.png"), auto;
+    border: solid 1px grey;
+}
