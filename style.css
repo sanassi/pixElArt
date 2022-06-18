@@ -3,7 +3,58 @@ body {
     font-family: "Roboto Thin", sans-serif;
 }
 
-#mainCanvas {
+#main, button {
     cursor: url("pixel-art-cursor.png"), auto;
+}
+
+#mainCanvas {
+
     border: solid 1px grey;
+}
+
+#mainCanvas, #toolBox {
+    display: inline-block;
+}
+
+#colorChooser {
+    margin: 3px;
+}
+
+#toolBox {
+    position: absolute;
+    alignment: top;
+}
+
+#drawingItems {
+    text-align: center;
+    margin: 10px;
+}
+
+#drawingItems button img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/*place color chooser at the top*/
+#colorSection {
+    border: solid 1px grey;
+    margin: 10px;
+    position: absolute;
+    alignment: top;
+}
+
+/*store previous colors when new color picked*/
+#colorHistory {
+    width: 100px;
+    height: 100px;
+    border-top: solid 1px grey;
+    margin: 1px;
+}
+
+#colorHistory button {
+    width: 20%;
+    height: 20%;
+    border: none;
+    margin: 2px;
 }
