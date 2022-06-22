@@ -1,15 +1,15 @@
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
 
-let colorChooser = document.getElementById('colorChooser');
+const colorChooser = document.getElementById('colorChooser');
 const colorHistory = document.getElementById('colorHistory');
 
-let penButton = document.getElementById('penButton');
-let eraserButton = document.getElementById('eraserButton');
+const penButton = document.getElementById('penButton');
+const eraserButton = document.getElementById('eraserButton');
+const fillButton = document.getElementById('fillButton');
 
 canvas.width = 500;
 canvas.height = 500;
-
 const nbRow = 50;
 const nbCol = 50;
 
@@ -21,7 +21,6 @@ let isEraser = false;
 penButton.addEventListener('click', () => {
     isPen = true;
     isEraser = false;
-    console.log('isPen');
 });
 
 eraserButton.addEventListener('click', () => {
@@ -77,15 +76,15 @@ function RGBToHex(rgb) {
 
     return "#" + r + g + b;
 }
-
+/*add previous colors to history*/
 function addColorToColorHist()
 {
-    let button = document.createElement('button');
-    button.style.backgroundColor = colorChooser.value;
-    button.addEventListener('click', () => {
-        colorChooser.value = RGBToHex(button.style.backgroundColor);
+    let prevColorButton = document.createElement('button');
+    prevColorButton.style.backgroundColor = colorChooser.value;
+    prevColorButton.addEventListener('click', () => {
+        colorChooser.value = RGBToHex(prevColorButton.style.backgroundColor);
     });
-    colorHistory.appendChild(button);
+    colorHistory.appendChild(prevColorButton);
 }
 
 colorChooser.addEventListener('change', addColorToColorHist);
@@ -100,13 +99,12 @@ function fillCellAtPoint(x, y) {
 
     /*given the drawing mode (pen or eraser) set the color accordingly*/
     let prevCtxFill = ctx.fillStyle;
-    if (isPen === true)
-    {
+    if (isPen === true) {
         ctx.fillStyle = colorChooser.value;
         canvasArr[Math.floor(y / cellHeight) * nbCol + Math.floor(x / cellWidth)] = ctx.fillStyle;
     }
-    else // eraser
-    {
+    else {
+        // eraser mode
         // set canvas cell color as white
         ctx.fillStyle = '#ffffff';
         // set canvas array cell to transparent
@@ -115,7 +113,7 @@ function fillCellAtPoint(x, y) {
 
     /*draw the cell on the canvas*/
     let region = new Path2D();
-    region.rect(cellX, cellY, cellWidth, cellHeight);
+    region.rect(cellX + 1, cellY + 1, cellWidth - 2, cellHeight - 2);
     region.closePath();
     ctx.fill(region);
     /*reset the context fill style*/
@@ -132,14 +130,13 @@ function fillCellAtMousePosition(event) {
 
     fillCellAtPoint(posX, posY);
     /*redraw the grid*/
-    drawGrid(canvas, nbRow, nbCol);
+    //drawGrid(canvas, nbRow, nbCol);
 }
 
 /*use canvas array (2d array to represent drawing (without grid lines)) to
 * create image to download*/
 function createResultImage(canvasArr, width, height, nbRow, nbCol) {
     let newCanvas = document.createElement('canvas');
-
     newCanvas.width = width;
     newCanvas.height = height;
 
@@ -162,24 +159,112 @@ function createResultImage(canvasArr, width, height, nbRow, nbCol) {
             newCtx.fillStyle = prevCtxFill;
         }
     }
-
     return newCanvas;
 }
 
-download_img = function(el) {
+
+class Queue {
+    constructor() {
+        this.elements = {};
+        this.head = 0;
+        this.tail = 0;
+    }
+    enqueue(element) {
+        this.elements[this.tail] = element;
+        this.tail++;
+    }
+    dequeue() {
+        const item = this.elements[this.head];
+        delete this.elements[this.head];
+        this.head++;
+        return item;
+    }
+    peek() {
+        return this.elements[this.head];
+    }
+    get length() {
+        return this.tail - this.head;
+    }
+    get isEmpty() {
+        return this.length === 0;
+    }
+}
+
+function fill(canvasArr, x, y, toPlace, toReplace) {
+    if (canvasArr[y * nbCol + x] === toReplace) {
+        console.log('fill()');
+        let q = new Queue();
+        q.enqueue([x, y]);
+        canvasArr[y * nbCol + x] = toPlace;
+
+        while (!q.isEmpty) {
+            let cell = q.dequeue();
+            let valX = cell[0];
+            let valY = cell[1];
+
+            fillCellAtPoint(valX * (canvas.height / nbRow), valY * (canvas.width / nbCol));
+
+
+            if (valY + 1 < canvas.height && canvasArr[(valY + 1) * nbCol + valX] === toReplace) {
+                let value = valY + 1;
+                canvasArr[(valY + 1) * nbCol + valX] = toPlace;
+                q.enqueue([valX, value]);
+            }
+
+            if (valY - 1 >= 0 && canvasArr[(valY - 1) * nbCol + valX] === toReplace) {
+                let value = valY - 1;
+                canvasArr[(valY - 1) * nbCol + valX] = toPlace;
+                q.enqueue([valX, value]);
+            }
+
+            if (valX + 1 < canvas.width && canvasArr[valY * nbCol + (valX + 1)] === toReplace) {
+                let value = valX + 1;
+                canvasArr[valY * nbCol + (valX + 1)] = toPlace;
+                q.enqueue([value, valY]);
+            }
+
+            if (valX - 1 >= 0 && canvasArr[valY * nbCol + (valX - 1)] === toReplace) {
+                let value = valX - 1;
+                canvasArr[valY * nbCol + (valX - 1)] = toPlace;
+                q.enqueue([value, valY]);
+            }
+        }
+    }
+}
+
+let isFiller = false;
+fillButton.addEventListener('click',  () => {
+    isPen = false;
+    isEraser = false;
+    isFiller = true;
+    //fill(canvasArr, 10, 10, '#001dff', 'rgba(255,255,255,0)');
+});
+
+canvas.addEventListener('mousedown', e => {
+    if (isFiller) {
+        isDrawing = true;
+        /*get mouse relative position to canvas*/
+        let rect = canvas.getBoundingClientRect();
+        let posX = e.x - rect.x;
+        let posY = e.y - rect.y;
+
+        fill(canvasArr, posX, posY, '#001dff', 'rgba(255,255,255,0)');
+    }
+})
+
+let download_img = function(el) {
     // get image URI from canvas object
     let newCanvas = createResultImage(canvasArr, canvas.width, canvas.height, nbRow, nbCol);
     el.href = newCanvas.toDataURL("image/jpg");
 };
 
+/*main event listeners*/
 canvas.onmousedown = fillCellAtMousePosition;
-
 canvas.addEventListener('mousemove' , e => {
     if (isDrawing === true) {
         fillCellAtMousePosition(e);
     }
 });
-
 canvas.addEventListener('mouseup', e => {
     if (isDrawing === true) {
         fillCellAtMousePosition(e);
