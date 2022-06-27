@@ -3,7 +3,11 @@ body {
     font-family: "Roboto Thin", sans-serif;
 }
 
-canvas {
+.layer_1, .layer_2 {
+    border: solid 1px grey;
+}
+
+#mainCanvas {
     border: solid 1px grey;
 }
 
@@ -11,10 +15,9 @@ canvas {
     cursor: url("pixel-art-cursor.png"), auto;
 }
 
-#mainCanvas, #toolBox {
+.layers, #toolBox {
     display: inline-block;
 }
-
 #colorChooser {
     margin: 3px;
 }

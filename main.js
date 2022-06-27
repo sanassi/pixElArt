@@ -4,6 +4,7 @@ const ctx = canvas.getContext('2d');
 const penBut = document.getElementById('penButton');
 const eraseBut = document.getElementById('eraserButton');
 const fillBut = document.getElementById('fillButton');
+const lassoBut = document.getElementById('lasso');
 const colorChooser = document.getElementById('colorChooser');
 const colorHistory = document.getElementById('colorHistory');
 
@@ -11,8 +12,9 @@ const clearBut = document.getElementById('clearButton');
 
 canvas.height = 500;
 canvas.width = 500;
-const nbRow = 20;
-const nbCol = 20;
+
+const nbRow = 30;
+const nbCol = 30;
 const cellW = canvas.width / nbCol;
 const cellH = canvas.height / nbRow;
 
@@ -30,6 +32,9 @@ let currentMode = 'none';
 /*why 'is drawing' ? : so that when mouse is up drawing === false
 * and when mouse is down drawing === true*/
 let isDrawing = false;
+/*store points selected when select button clicked*/
+let pointsInsideLasso = [];
+let isLassoing = false;
 
 function drawLine(x1, y1, x2, y2) {
     ctx.beginPath();
@@ -52,7 +57,7 @@ function drawGrid(canvas, nbRow, nbCol) {
 
 drawGrid(canvas, nbRow, nbCol);
 
-/*convert color from rgb(r, g, b) format to hex (code from css-tricks.com )*/
+/*convert color from rgb(r, g, b) format to hex (code from css-tricks.com)*/
 function RGBToHex(rgb) {
     // Choose correct separator
     let sep = rgb.indexOf(",") > -1 ? "," : " ";
@@ -73,8 +78,7 @@ function RGBToHex(rgb) {
     return "#" + r + g + b;
 }
 /*add previous colors to history*/
-function addColorToColorHist()
-{
+function addColorToColorHist() {
     let prevColorButton = document.createElement('button');
     prevColorButton.style.backgroundColor = colorChooser.value;
     prevColorButton.addEventListener('click', () => {
@@ -109,15 +113,18 @@ eraseBut.addEventListener('click', () => {
 fillBut.addEventListener('click', () => {
     currentMode = 'filler';
 });
-
 clearBut.addEventListener('click', () => {
     if (window.confirm('Click OK to erase your drawing')) {
         canvasAsArr = initCanvasArr();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawGrid(canvas, nbRow, nbCol);
     }
-})
+});
+lassoBut.addEventListener('click', () => {
+    currentMode = 'lasso';
+});
 
+/*fill cell given coordinates of top left corner*/
 function fillCellAtPos(cellX, cellY, color) {
     ctx.fillStyle = color;
     let region = new Path2D();
@@ -130,6 +137,8 @@ function getCellColor(cellX, cellY) {
     return canvasAsArr[Math.floor(cellY / cellH) * nbCol + Math.floor(cellX / cellW)];
 }
 
+/*when canvas clicked, given current drawing mode :
+* do something*/
 function onCanvasClick(event) {
     let mousePos = getMousePos(event);
     let mouseX = mousePos[0];
@@ -154,13 +163,64 @@ function onCanvasClick(event) {
     }
 
     if (currentMode === 'filler') {
-        /*replace colo of cells connected to clicked cell by
+        /*replace color of cells connected to clicked cell by
         * current color chooser value*/
         fill(canvasAsArr, Math.floor(cellX / cellW),
             Math.floor(cellY / cellH),
             colorChooser.value,
             getCellColor(cellX, cellY));
     }
+
+    if (currentMode === 'lasso') {
+        isLassoing = true;
+        console.log(cellPos);
+        ctx.fillStyle = '#0000ff';
+        if (pointsInsideLasso.length % 3 === 0 && pointsInsideLasso.length > 1) {
+            let lastPoint = pointsInsideLasso[pointsInsideLasso.length - 1];
+            let prevLineW = ctx.lineWidth;
+            ctx.lineWidth = 3;
+            drawLine(lastPoint[0],
+                     lastPoint[1],
+                     mousePos[0],
+                     mousePos[1]);
+            ctx.lineWidth = prevLineW;
+        }
+        pointsInsideLasso.push(mousePos);
+    }
+}
+
+/*given point coordinates check if point is inside given polygon
+* code from "eecs.umich.edu" (raycast method)
+*/
+function pointIsInPolygon(polygon, p) {
+    let counter = 0;
+    let p1 = polygon[0];
+
+    let N = polygon.length;
+    let pX = p[0], pY = p[1];
+
+    for (let i = 1; i <= N; i++) {
+        let p2 = polygon[i % N];
+
+        let p1X = p1[0], p1Y = p1[1];
+        let p2X = p2[0], p2Y = p2[1];
+
+        if (pY > Math.min(p1Y, p2Y)) {
+            if (pY <= Math.max(p1Y, p2Y)) {
+                if (pX <= Math.max(p1X, p2X)) {
+                    if (p1Y !== p2Y) {
+                        let xInters = (pY - p1Y) * (p2X - p1X) / (p2Y - p1Y) + p1X;
+                        if (p1X === p2X || pX <= xInters) {
+                            counter += 1;
+                        }
+                    }
+                }
+            }
+        }
+        p1 = p2;
+    }
+
+    return counter % 2 !== 0;
 }
 
 /*queue class (used to perform flood fill (to fill cells))*/
@@ -180,9 +240,12 @@ class Queue {
         this.head++;
         return item;
     }
+    /*
     peek() {
         return this.elements[this.head];
     }
+    */
+
     get length() {
         return this.tail - this.head;
     }
@@ -190,11 +253,10 @@ class Queue {
         return this.length === 0;
     }
 }
-
+/*todo : cleanup fill function*/
 function fill(canvasArr, x, y, toPlace, toReplace) {
     console.log(canvasArr[y * nbCol + x]);
     if (canvasArr[y * nbCol + x] === toReplace) {
-        console.log('fill()');
         let q = new Queue();
         q.enqueue([x, y]);
         canvasArr[y * nbCol + x] = toPlace;
@@ -237,6 +299,7 @@ function fill(canvasArr, x, y, toPlace, toReplace) {
     }
 }
 
+/*use canvas stored as array to redraw canvas (without grid lines)*/
 function createResultImage(canvasAsArr, width, height, nbRow, nbCol) {
     let newCanvas = document.createElement('canvas');
     newCanvas.width = width;
@@ -270,18 +333,36 @@ let download_img = function(el) {
     el.href = newCanvas.toDataURL("image/jpg");
 };
 
+/*if mouse is down draw something*/
 canvas.addEventListener('mousedown', e => {
     onCanvasClick(e);
 });
+/*while mouse is moving do something*/
 canvas.addEventListener('mousemove', e => {
     if (isDrawing) {
         onCanvasClick(e);
     }
+    if (isLassoing) {
+        onCanvasClick(e);
+    }
 });
+/*is mouse is up / stops moving do something else (stop drawing)*/
 canvas.addEventListener('mouseup', e => {
     if (isDrawing) {
         onCanvasClick(e);
         isDrawing = false;
+    }
+
+    if (isLassoing) {
+        onCanvasClick(e);
+        isLassoing = false;
+        for (let i = 0; i < nbCol; i++) {
+            for (let j = 0; j < nbRow; j++) {
+                if (pointIsInPolygon(pointsInsideLasso, [i * cellW, j * cellH])) {
+                    fillCellAtPos(i * cellW, j * cellH, 'rgba(0,0,255,0.1)');
+                }
+            }
+        }
     }
 });
 window.addEventListener('load', () => {

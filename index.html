@@ -6,27 +6,31 @@
     <script src="main.js" defer></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-<h1>PixElArt</h1>
-    <div id="main">
+    <body>
+        <h1>PixElArt</h1>
+            <div id="main">
+                <div class="layers">
+                    <div class="layer_1">
+                        <canvas id="mainCanvas"></canvas>
+                    </div>
+                </div>
 
-        <canvas id="mainCanvas"></canvas>
+                <div id="toolBox">
+                    <div id="drawingItems">
+                        <button id="penButton"><img alt="pen-icon" src="icons/pen.png"></button>
+                        <button id="eraserButton"><img alt="eraser-icon" src="icons/eraser.png"></button>
+                        <button id="fillButton"><img alt="fill-icon" src="icons/fill.png"></button>
+                        <button id="lasso"><img alt="lasso-icon" src="icons/lasso.png"></button>
+                    </div>
+                    <button id="clearButton">Clear</button>
 
-        <div id="toolBox">
-            <div id="drawingItems">
-                <button id="penButton"><img alt="pen-icon" src="icons/pen.png"></button>
-                <button id="eraserButton"><img alt="eraser-icon" src="icons/eraser.png"></button>
-                <button id="fillButton"><img alt="fill-icon" src="icons/fill.png"></button>
+                    <div id="colorSection">
+                        <label for="colorChooser">Color</label>
+                        <input id="colorChooser" type="color" value="#ff0000">
+                        <div id="colorHistory"></div>
+                    </div>
+                </div>
             </div>
-            <button id="clearButton">Clear</button>
-
-            <div id="colorSection">
-                <label for="colorChooser">Color</label>
-                <input id="colorChooser" type="color" value="#ff0000">
-                <div id="colorHistory"></div>
-            </div>
-        </div>
-    </div>
-    <a id="download" download="myImage.jpg" href="" onclick="download_img(this);">Download to myImage.jpg</a>
-</body>
+            <a id="download" download="myImage.jpg" href="" onclick="download_img(this);">Download to myImage.jpg</a>
+    </body>
 </html>
