@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="scripts/main.js" defer></script>
+    <script src="main.js" defer></script>
     <link rel="stylesheet" href="style.css">
 </head>
-    <body>
-        <h1>PixElArt</h1>
-        <div id="main">
+<body>
+<h1>PixElArt</h1>
+    <div id="main">
 
-            <canvas id="mainCanvas"></canvas>
+        <canvas id="mainCanvas"></canvas>
 
-            <div id="toolBox">
-                <div id="drawingItems">
-                    <button id="penButton"><img alt="pen-icon" src="icons/pen.png"></button>
-                    <button id="eraserButton"><img alt="eraser-icon" src="icons/eraser.png"></button>
-                    <button id="fillButton"><img alt="fill-icon" src="icons/fill.png"></button>
-                </div>
-
-                <div id="colorSection">
-                    <label for="colorChooser">Color</label>
-                    <input id="colorChooser" type="color" value="#ff0000">
-                    <div id="colorHistory"></div>
-                </div>
+        <div id="toolBox">
+            <div id="drawingItems">
+                <button id="penButton"><img alt="pen-icon" src="icons/pen.png"></button>
+                <button id="eraserButton"><img alt="eraser-icon" src="icons/eraser.png"></button>
+                <button id="fillButton"><img alt="fill-icon" src="icons/fill.png"></button>
             </div>
+            <button id="clearButton">Clear</button>
 
+            <div id="colorSection">
+                <label for="colorChooser">Color</label>
+                <input id="colorChooser" type="color" value="#ff0000">
+                <div id="colorHistory"></div>
+            </div>
         </div>
-        <a id="download" download="myImage.jpg" href="" onclick="download_img(this);">Download to myImage.jpg</a>
-    </body>
+    </div>
+    <a id="download" download="myImage.jpg" href="" onclick="download_img(this);">Download to myImage.jpg</a>
+</body>
 </html>

@@ -3,13 +3,12 @@ body {
     font-family: "Roboto Thin", sans-serif;
 }
 
-#main, button {
-    cursor: url("pixel-art-cursor.png"), auto;
+canvas {
+    border: solid 1px grey;
 }
 
-#mainCanvas {
-
-    border: solid 1px grey;
+#main, button {
+    cursor: url("pixel-art-cursor.png"), auto;
 }
 
 #mainCanvas, #toolBox {
