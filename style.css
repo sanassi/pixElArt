@@ -11,6 +11,7 @@ body {
     border: solid 1px grey;
 }
 
+
 #main, button {
     cursor: url("pixel-art-cursor.png"), auto;
 }

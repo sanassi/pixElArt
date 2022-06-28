@@ -105,15 +105,19 @@ function getCellPos(mouseX, mouseY) {
 
 /*drawing buttons event handlers*/
 penBut.addEventListener('click', () => {
+    canvas.style.cursor = `url("/icons/pen.png") ${0} ${24}, auto`;
     currentMode = 'pen';
 });
 eraseBut.addEventListener('click', () => {
+    canvas.style.cursor = `url("/icons/eraser.png") ${0} ${24}, auto`;
     currentMode = 'eraser';
 });
 fillBut.addEventListener('click', () => {
+    canvas.style.cursor = `url("/icons/fill.png") ${0} ${24}, auto`;
     currentMode = 'filler';
 });
 clearBut.addEventListener('click', () => {
+    canvas.style.cursor = 'url("pixel-art-cursor.png"), auto';
     if (window.confirm('Click OK to erase your drawing')) {
         canvasAsArr = initCanvasArr();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -121,6 +125,7 @@ clearBut.addEventListener('click', () => {
     }
 });
 lassoBut.addEventListener('click', () => {
+    canvas.style.cursor = 'url("pixel-art-cursor.png"), auto';
     currentMode = 'lasso';
 });
 
@@ -190,7 +195,7 @@ function onCanvasClick(event) {
 }
 
 /*given point coordinates check if point is inside given polygon
-* code from "eecs.umich.edu" (raycast method)
+* algorithm from "eecs.umich.edu" (raycast method)
 */
 function pointIsInPolygon(polygon, p) {
     let counter = 0;
@@ -328,7 +333,7 @@ function createResultImage(canvasAsArr, width, height, nbRow, nbCol) {
 }
 
 let download_img = function(el) {
-    // get image URI from canvas object
+    // get image URL from canvas object
     let newCanvas = createResultImage(canvasAsArr, canvas.width, canvas.height, nbRow, nbCol);
     el.href = newCanvas.toDataURL("image/jpg");
 };
@@ -359,7 +364,7 @@ canvas.addEventListener('mouseup', e => {
         for (let i = 0; i < nbCol; i++) {
             for (let j = 0; j < nbRow; j++) {
                 if (pointIsInPolygon(pointsInsideLasso, [i * cellW, j * cellH])) {
-                    fillCellAtPos(i * cellW, j * cellH, 'rgba(0,0,255,0.1)');
+                    fillCellAtPos(i * cellW, j * cellH, 'rgba(0,0,255,0.5)');
                 }
             }
         }
