@@ -5,6 +5,8 @@ const penBut = document.getElementById('penButton');
 const eraseBut = document.getElementById('eraserButton');
 const fillBut = document.getElementById('fillButton');
 const lassoBut = document.getElementById('lasso');
+const pickerBut = document.getElementById('picker');
+const moveBut = document.getElementById('moveButton');
 const colorChooser = document.getElementById('colorChooser');
 const colorHistory = document.getElementById('colorHistory');
 
@@ -13,8 +15,8 @@ const clearBut = document.getElementById('clearButton');
 canvas.height = 500;
 canvas.width = 500;
 
-const nbRow = 30;
-const nbCol = 30;
+const nbRow = 50;
+const nbCol = 50;
 const cellW = canvas.width / nbCol;
 const cellH = canvas.height / nbRow;
 
@@ -35,6 +37,11 @@ let isDrawing = false;
 /*store points selected when select button clicked*/
 let pointsInsideLasso = [];
 let isLassoing = false;
+
+/*
+let cellsToMove = [];
+let isMoving = false;
+*/
 
 function drawLine(x1, y1, x2, y2) {
     ctx.beginPath();
@@ -103,7 +110,9 @@ function getCellPos(mouseX, mouseY) {
     return [cellX, cellY];
 }
 
-/*drawing buttons event handlers*/
+/*drawing buttons event handlers
+* when button is clicked set mode, change cursor
+*/
 penBut.addEventListener('click', () => {
     canvas.style.cursor = `url("/icons/pen.png") ${0} ${24}, auto`;
     currentMode = 'pen';
@@ -127,6 +136,16 @@ clearBut.addEventListener('click', () => {
 lassoBut.addEventListener('click', () => {
     canvas.style.cursor = 'url("pixel-art-cursor.png"), auto';
     currentMode = 'lasso';
+});
+
+pickerBut.addEventListener('click', () => {
+    canvas.style.cursor = `url("/icons/picker.png") ${0} ${22}, auto`;
+    currentMode = 'picker';
+});
+
+moveBut.addEventListener('click', () => {
+    canvas.style.cursor = `url("/icons/move.png") ${11} ${12}, auto`;
+    currentMode = 'move';
 });
 
 /*fill cell given coordinates of top left corner*/
@@ -191,6 +210,18 @@ function onCanvasClick(event) {
             ctx.lineWidth = prevLineW;
         }
         pointsInsideLasso.push(mousePos);
+    }
+
+    /*
+    if (currentMode === 'move') {
+        if (isMoving) {
+
+        }
+    }
+    */
+
+    if (currentMode === 'picker') {
+        colorChooser.value = getCellColor(cellX, cellY);
     }
 }
 
@@ -340,6 +371,18 @@ let download_img = function(el) {
 
 /*if mouse is down draw something*/
 canvas.addEventListener('mousedown', e => {
+
+    /*
+    if (currentMode === 'move') {
+        if (!isMoving) {
+            let cellPos = getCellPos(getMousePos(e)[0], getMousePos(e)[1]);
+            console.log(cellPos);
+            cellsToMove.push(cellPos);
+            isMoving = true;
+        }
+    }
+    */
+
     onCanvasClick(e);
 });
 /*while mouse is moving do something*/
@@ -351,7 +394,7 @@ canvas.addEventListener('mousemove', e => {
         onCanvasClick(e);
     }
 });
-/*is mouse is up / stops moving do something else (stop drawing)*/
+/*if mouse is up / stops moving do something else (stop drawing)*/
 canvas.addEventListener('mouseup', e => {
     if (isDrawing) {
         onCanvasClick(e);
@@ -369,7 +412,28 @@ canvas.addEventListener('mouseup', e => {
             }
         }
     }
+
+    /*
+    if (isMoving) {
+        let cell = cellsToMove[cellsToMove.length - 1];
+        console.log(cellsToMove);
+        let mousePos = getMousePos(e);
+        let mouseX = mousePos[0], mouseY = mousePos[1];
+
+        let cellDestPos = getCellPos(mousePos[0], mousePos[1]);
+        let cellDestX = cellDestPos[0], cellDestY = cellDestPos[1];
+
+        fillCellAtPos(cellDestPos[0], cellDestPos[1], getCellColor(cell[0], cell[1]));
+        //canvasAsArr[cellDestY * nbCol + cellDestX] = getCellColor(cell[0], cell[1]);
+        console.log(cellDestPos);
+        fillCellAtPos(cell[0], cell[1], 'rgba(255, 255, 255)');
+        //cellsToMove = [];
+
+        isMoving = false;
+    }
+    */
 });
+
 window.addEventListener('load', () => {
     drawGrid(canvas, nbRow, nbCol);
 });

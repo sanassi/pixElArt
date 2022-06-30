@@ -3,16 +3,12 @@ body {
     font-family: "Roboto Thin", sans-serif;
 }
 
-.layer_1, .layer_2 {
-    border: solid 1px grey;
-}
-
-#mainCanvas {
-    border: solid 1px grey;
-}
-
 #main, button {
     cursor: url("pixel-art-cursor.png"), auto;
+}
+
+.layer_1 {
+    border: solid 1px grey;
 }
 
 .layers, #toolBox {
@@ -23,6 +19,7 @@ body {
 }
 
 #toolBox {
+    width: 100px;
     position: absolute;
     alignment: top;
 }
