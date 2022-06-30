@@ -1,3 +1,4 @@
+/*get dom elements*/
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -9,14 +10,18 @@ const pickerBut = document.getElementById('picker');
 const moveBut = document.getElementById('moveButton');
 const colorChooser = document.getElementById('colorChooser');
 const colorHistory = document.getElementById('colorHistory');
+const downloadBut = document.getElementById('downloadButton');
+const smallPenBut = document.getElementById('smallPenSize');
+const mediumPenBut = document.getElementById('mediumPenSize');
+
 
 const clearBut = document.getElementById('clearButton');
 
-canvas.height = 500;
-canvas.width = 500;
+canvas.height = 600;
+canvas.width = 600;
 
-const nbRow = 50;
-const nbCol = 50;
+const nbRow = 30;
+const nbCol = 30;
 const cellW = canvas.width / nbCol;
 const cellH = canvas.height / nbRow;
 
@@ -38,10 +43,13 @@ let isDrawing = false;
 let pointsInsideLasso = [];
 let isLassoing = false;
 
+let penSize = 1;
+
 /*
 let cellsToMove = [];
 let isMoving = false;
 */
+
 
 function drawLine(x1, y1, x2, y2) {
     ctx.beginPath();
@@ -53,11 +61,11 @@ function drawGrid(canvas, nbRow, nbCol) {
     let cellWidth = canvas.width / nbCol;
     let cellHeight = canvas.height / nbRow;
 
-    for (let i = 0; i < nbCol; i++) {
+    for (let i = 0; i <= nbCol; i++) {
         drawLine(i * cellWidth, 0, i * cellWidth, canvas.height);
     }
 
-    for (let i = 0; i < nbRow; i++) {
+    for (let i = 0; i <= nbRow; i++) {
         drawLine(0, i * cellHeight, canvas.width, i * cellHeight);
     }
 }
@@ -148,6 +156,14 @@ moveBut.addEventListener('click', () => {
     currentMode = 'move';
 });
 
+smallPenBut.addEventListener('click', () => {
+    penSize = 1;
+});
+
+mediumPenBut.addEventListener('click', () => {
+    penSize = 2;
+});
+
 /*fill cell given coordinates of top left corner*/
 function fillCellAtPos(cellX, cellY, color) {
     ctx.fillStyle = color;
@@ -156,6 +172,32 @@ function fillCellAtPos(cellX, cellY, color) {
     region.closePath();
     ctx.fill(region);
 }
+
+/*given pen size draw on canvas*/
+function drawPenOnCanvas(cellX, cellY, penSize, penColor) {
+    if (penSize === 1) {
+        fillCellAtPos(cellX, cellY, penColor);
+    }
+    else if (penSize === 2) {
+        fillCellAtPos(cellX + cellW, cellY, penColor);
+        fillCellAtPos(cellX, cellY + cellH, penColor);
+        fillCellAtPos(cellX + cellW, cellY + cellH, penColor);
+        fillCellAtPos(cellX, cellY, penColor);
+    }
+}
+
+function drawPenOnCanvasArray(mouseX, mouseY, penSize, color) {
+    if (penSize === 1) {
+        canvasAsArr[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = color;
+    }
+    else if (penSize === 2) {
+        canvasAsArr[Math.floor(mouseY / cellH + 1) * nbCol + Math.floor(mouseX / cellW)] = color;
+        canvasAsArr[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW + 1)] = color;
+        canvasAsArr[Math.floor(mouseY / cellH + 1) * nbCol + Math.floor(mouseX / cellW + 1)] = color;
+        canvasAsArr[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = color;
+    }
+}
+/*--------------------------------*/
 
 function getCellColor(cellX, cellY) {
     return canvasAsArr[Math.floor(cellY / cellH) * nbCol + Math.floor(cellX / cellW)];
@@ -175,15 +217,23 @@ function onCanvasClick(event) {
     if (currentMode === 'pen') {
         let color = colorChooser.value;
         isDrawing = true;
+        /*
         canvasAsArr[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = ctx.fillStyle;
         fillCellAtPos(cellX, cellY, color);
+        */
+         drawPenOnCanvas(cellX, cellY, penSize, color);
+         drawPenOnCanvasArray(mouseX, mouseY, penSize, ctx.fillStyle);
     }
 
     if (currentMode === 'eraser') {
         let whiteColor = '#ffffff';
         isDrawing = true;
+        /*
         canvasAsArr[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = '#ffffff00';
         fillCellAtPos(cellX, cellY, whiteColor);
+        */
+        drawPenOnCanvas(cellX, cellY, penSize, whiteColor);
+        drawPenOnCanvasArray(mouseX, mouseY, penSize, '#ffffff00');
     }
 
     if (currentMode === 'filler') {
@@ -362,12 +412,25 @@ function createResultImage(canvasAsArr, width, height, nbRow, nbCol) {
     }
     return newCanvas;
 }
-
+/*
 let download_img = function(el) {
     // get image URL from canvas object
     let newCanvas = createResultImage(canvasAsArr, canvas.width, canvas.height, nbRow, nbCol);
     el.href = newCanvas.toDataURL("image/jpg");
 };
+*/
+
+downloadBut.addEventListener('click', () => {
+   let canvasUrl = createResultImage(canvasAsArr, canvas.width, canvas.height, nbRow, nbCol).toDataURL();
+   const dlLink = document.createElement('a');
+   dlLink.href = canvasUrl;
+   let name = prompt();
+   while (name === '') {
+       name = prompt();
+   }
+   dlLink.download = name;
+   dlLink.click();
+});
 
 /*if mouse is down draw something*/
 canvas.addEventListener('mousedown', e => {

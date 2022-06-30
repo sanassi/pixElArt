@@ -8,7 +8,8 @@ body {
 }
 
 .layer_1 {
-    border: solid 1px grey;
+    margin: 15px;
+    border: none 1px grey;
 }
 
 .layers, #toolBox {
@@ -28,6 +29,25 @@ body {
     text-align: center;
     margin: 10px;
 }
+/*
+#drawingSize {
+    margin: 5px;
+    align-content: center;
+    display: inline-block;
+    width: 120px;
+}
+
+#drawingSize button{
+    align-content: center;
+    width: 30px;
+    height: 30px;
+}
+
+#size-input {
+    height: 24px;
+    width: 40px;
+}
+*/
 
 #drawingItems button img{
     display: block;

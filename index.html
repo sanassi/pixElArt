@@ -5,9 +5,10 @@
     <title>Title</title>
     <script src="main.js" defer></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="icons/site-icon.png">
 </head>
     <body>
-        <h1>PixElArt</h1>
+        <img src="pixElArt-logo.png" alt="logo">
             <div id="main">
                 <div class="layers">
                     <div class="layer_1">
@@ -16,6 +17,12 @@
                 </div>
 
                 <div id="toolBox">
+                    <label for="drawingSize">Pen Size</label>
+                    <div id="drawingSize">
+                        <button id="smallPenSize"><img src="icons/small-size-icon.png" alt="small-size-pen"></button>
+                        <button id="mediumPenSize"><img src="icons/medium-size-icon.png" alt="medium-size-pen"></button>
+                    </div>
+
                     <div id="drawingItems">
                         <button id="penButton"><img alt="pen-icon" src="icons/pen.png"></button>
                         <button id="eraserButton"><img alt="eraser-icon" src="icons/eraser.png"></button>
@@ -33,6 +40,10 @@
                     </div>
                 </div>
             </div>
-            <a id="download" download="myImage.jpg" href="" onclick="download_img(this);">Download to myImage.jpg</a>
+
+        <button id="downloadButton"><img src="icons/download-icon.png" alt="download-icon"></button>
+        <!--
+        <a id="download" download="myImage.jpg" href="" onclick="download_img(this);">Download to myImage.jpg</a>
+        !-->
     </body>
 </html>
