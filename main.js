@@ -25,7 +25,7 @@ const nbCol = 30;
 const cellW = canvas.width / nbCol;
 const cellH = canvas.height / nbRow;
 
-function initCanvasArr() {
+function initCanvasArray() {
     let canvasAsArr = new Array(nbCol * nbRow);
     for (let i = 0; i < nbRow * nbCol; i++) {
         canvasAsArr[i] = 'rgba(255,255,255,0)';
@@ -34,7 +34,7 @@ function initCanvasArr() {
     return canvasAsArr;
 }
 
-let canvasAsArr = initCanvasArr();
+let canvasAsArray = initCanvasArray();
 let currentMode = 'none';
 /*why 'is drawing' ? : so that when mouse is up drawing === false
 * and when mouse is down drawing === true*/
@@ -136,7 +136,7 @@ fillBut.addEventListener('click', () => {
 clearBut.addEventListener('click', () => {
     canvas.style.cursor = 'url("pixel-art-cursor.png"), auto';
     if (window.confirm('Click OK to erase your drawing')) {
-        canvasAsArr = initCanvasArr();
+        canvasAsArray = initCanvasArray();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawGrid(canvas, nbRow, nbCol);
     }
@@ -188,19 +188,19 @@ function drawPenOnCanvas(cellX, cellY, penSize, penColor) {
 
 function drawPenOnCanvasArray(mouseX, mouseY, penSize, color) {
     if (penSize === 1) {
-        canvasAsArr[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = color;
+        canvasAsArray[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = color;
     }
     else if (penSize === 2) {
-        canvasAsArr[Math.floor(mouseY / cellH + 1) * nbCol + Math.floor(mouseX / cellW)] = color;
-        canvasAsArr[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW + 1)] = color;
-        canvasAsArr[Math.floor(mouseY / cellH + 1) * nbCol + Math.floor(mouseX / cellW + 1)] = color;
-        canvasAsArr[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = color;
+        canvasAsArray[Math.floor(mouseY / cellH + 1) * nbCol + Math.floor(mouseX / cellW)] = color;
+        canvasAsArray[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW + 1)] = color;
+        canvasAsArray[Math.floor(mouseY / cellH + 1) * nbCol + Math.floor(mouseX / cellW + 1)] = color;
+        canvasAsArray[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = color;
     }
 }
 /*--------------------------------*/
 
 function getCellColor(cellX, cellY) {
-    return canvasAsArr[Math.floor(cellY / cellH) * nbCol + Math.floor(cellX / cellW)];
+    return canvasAsArray[Math.floor(cellY / cellH) * nbCol + Math.floor(cellX / cellW)];
 }
 
 /*when canvas clicked, given current drawing mode :
@@ -218,7 +218,7 @@ function onCanvasClick(event) {
         let color = colorChooser.value;
         isDrawing = true;
         /*
-        canvasAsArr[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = ctx.fillStyle;
+        canvasAsArray[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = ctx.fillStyle;
         fillCellAtPos(cellX, cellY, color);
         */
          drawPenOnCanvas(cellX, cellY, penSize, color);
@@ -229,7 +229,7 @@ function onCanvasClick(event) {
         let whiteColor = '#ffffff';
         isDrawing = true;
         /*
-        canvasAsArr[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = '#ffffff00';
+        canvasAsArray[Math.floor(mouseY / cellH) * nbCol + Math.floor(mouseX / cellW)] = '#ffffff00';
         fillCellAtPos(cellX, cellY, whiteColor);
         */
         drawPenOnCanvas(cellX, cellY, penSize, whiteColor);
@@ -239,7 +239,7 @@ function onCanvasClick(event) {
     if (currentMode === 'filler') {
         /*replace color of cells connected to clicked cell by
         * current color chooser value*/
-        fill(canvasAsArr, Math.floor(cellX / cellW),
+        fill(canvasAsArray, Math.floor(cellX / cellW),
             Math.floor(cellY / cellH),
             colorChooser.value,
             getCellColor(cellX, cellY));
@@ -415,13 +415,13 @@ function createResultImage(canvasAsArr, width, height, nbRow, nbCol) {
 /*
 let download_img = function(el) {
     // get image URL from canvas object
-    let newCanvas = createResultImage(canvasAsArr, canvas.width, canvas.height, nbRow, nbCol);
+    let newCanvas = createResultImage(canvasAsArray, canvas.width, canvas.height, nbRow, nbCol);
     el.href = newCanvas.toDataURL("image/jpg");
 };
 */
 
 downloadBut.addEventListener('click', () => {
-   let canvasUrl = createResultImage(canvasAsArr, canvas.width, canvas.height, nbRow, nbCol).toDataURL();
+   let canvasUrl = createResultImage(canvasAsArray, canvas.width, canvas.height, nbRow, nbCol).toDataURL();
    const dlLink = document.createElement('a');
    dlLink.href = canvasUrl;
    let name = prompt();
@@ -487,7 +487,7 @@ canvas.addEventListener('mouseup', e => {
         let cellDestX = cellDestPos[0], cellDestY = cellDestPos[1];
 
         fillCellAtPos(cellDestPos[0], cellDestPos[1], getCellColor(cell[0], cell[1]));
-        //canvasAsArr[cellDestY * nbCol + cellDestX] = getCellColor(cell[0], cell[1]);
+        //canvasAsArray[cellDestY * nbCol + cellDestX] = getCellColor(cell[0], cell[1]);
         console.log(cellDestPos);
         fillCellAtPos(cell[0], cell[1], 'rgba(255, 255, 255)');
         //cellsToMove = [];
